@@ -8,7 +8,7 @@ import (
 // TestHTTPScrape tests a scrape from content on httpbin.org
 func TestHTTPScrape(t *testing.T) {
 
-	Debug = true
+	Debug = false
 
 	// make a new session
 	session, err := NewChromeSession("http://google.com")
