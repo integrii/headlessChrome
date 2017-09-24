@@ -16,6 +16,9 @@ func TestHTTPScrape(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	session.Write(`console.log("DEBUG")\r\n`)
+	session.Write(`console.log(document)`)
+	session.Write(`console.log("DEBUG")`)
 	session.Write(`console.log("DEBUG")`)
 	session.Exit()
 

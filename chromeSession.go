@@ -5,8 +5,11 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"os"
 	"os/exec"
 	"strings"
+
+	"github.com/kr/pty"
 )
 
 // Debug enables debug output for this package to console
@@ -23,6 +26,7 @@ type ChromeSession struct {
 	Input  chan string // incoming lines of input
 	Output chan string // outgoing lines of input
 	cmd    *exec.Cmd   // cmd that holds this chrome instance
+	pty    *os.File    // the tty for the session
 }
 
 // WriteString writes a string to the console as if you wrote
@@ -31,17 +35,15 @@ func (cs *ChromeSession) writeString(s string) error {
 	if Debug {
 		fmt.Println("Writing string:", s)
 	}
-	len, err := io.WriteString(cs.stdIn, s)
-	if Debug {
-		fmt.Println("Wrote", len, "bytes")
-	}
+	// len, err := io.WriteString(cs.stdIn, s)
+	_, err := cs.pty.WriteString(s + "\r\n")
 	return err
 }
 
 // ReadAllOutput reads all output as of when read.  Each
 // output is a line.
 func (cs *ChromeSession) startOutputReader() {
-	reader := bufio.NewScanner(cs.stdOut)
+	reader := bufio.NewScanner(cs.pty)
 	if Debug {
 		fmt.Println("Output reader looking for output")
 	}
@@ -112,13 +114,18 @@ func (cs *ChromeSession) Write(s string) {
 // closeWhenCompleted closes ouput channels to cause readers to
 // end gracefully when the command completes
 func (cs *ChromeSession) closeWhenCompleted() {
-	defer cs.forceClose() // when complete, make sure the PID dies (it never does on its own)
+
+	if Debug {
+		fmt.Println("Spawned chrome as PID", cs.cmd.Process.Pid)
+	}
 
 	cs.cmd.Wait()
 	if Debug {
 		fmt.Println("Command exited. Closing channels.")
 	}
 	close(cs.Output)
+
+	cs.forceClose() // when complete, make sure the PID dies (chrome never does on its own as of writing)
 }
 
 // NewChromeSession starts a new chrome headless session.
@@ -156,7 +163,7 @@ func NewChromeSession(url string) (*ChromeSession, error) {
 	session.stdIn = inPipe
 	session.stdErr = errPipe
 
-	// make channels for communication
+	// make channels for input and outut communication to the process
 	session.Input = make(chan string, 1)
 	session.Output = make(chan string, 5000)
 
@@ -165,7 +172,7 @@ func NewChromeSession(url string) (*ChromeSession, error) {
 	}
 
 	// kick off the command and ensure it closes when done
-	err = session.cmd.Start()
+	session.pty, _ = pty.Start(session.cmd)
 	if err != nil {
 		return &session, err
 	}
