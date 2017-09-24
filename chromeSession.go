@@ -17,12 +17,12 @@ const expectedFirstLine = "Type a Javascript expression to evaluate or \"quit\" 
 // ChromeSession is an interactive console session with a Chrome
 // instance.
 type ChromeSession struct {
-	input    io.Writer   // input to be written to the console
-	output   io.Reader   // output coming from the console
-	cliError io.Reader   // error output from the shell
-	Input    chan string // incoming lines of input
-	Output   chan string // outgoing lines of input
-	cmd      *exec.Cmd   // cmd that holds this chrome instance
+	stdIn  io.Writer   // input to be written to the console
+	stdOut io.Reader   // output coming from the console
+	stdErr io.Reader   // error output from the shell
+	Input  chan string // incoming lines of input
+	Output chan string // outgoing lines of input
+	cmd    *exec.Cmd   // cmd that holds this chrome instance
 }
 
 // WriteString writes a string to the console as if you wrote
@@ -31,7 +31,7 @@ func (cs *ChromeSession) writeString(s string) error {
 	if Debug {
 		fmt.Println("Writing string:", s)
 	}
-	len, err := io.WriteString(cs.input, s)
+	len, err := io.WriteString(cs.stdIn, s)
 	if Debug {
 		fmt.Println("Wrote", len, "bytes")
 	}
@@ -41,24 +41,36 @@ func (cs *ChromeSession) writeString(s string) error {
 // ReadAllOutput reads all output as of when read.  Each
 // output is a line.
 func (cs *ChromeSession) startOutputReader() {
-	reader := bufio.NewScanner(cs.output)
+	reader := bufio.NewScanner(cs.stdOut)
+	if Debug {
+		fmt.Println("Output reader looking for output")
+	}
 	for reader.Scan() {
 		if Debug {
-			fmt.Println("Reader got text:", reader.Text())
+			fmt.Println("Output reader got text:", reader.Text())
 		}
 		cs.Output <- reader.Text()
+		if Debug {
+			fmt.Println("Reader passed text to outut channel:", reader.Text())
+		}
 	}
 }
 
 // startErrorReader starts an error reader that outputs
 // to the output channel
 func (cs *ChromeSession) startErrorReader() {
-	reader := bufio.NewScanner(cs.cliError)
+	reader := bufio.NewScanner(cs.stdErr)
+	if Debug {
+		fmt.Println("Error reader looking for output")
+	}
 	for reader.Scan() {
 		if Debug {
 			fmt.Println("Error reader got text:", reader.Text())
 		}
 		cs.Output <- reader.Text()
+		if Debug {
+			fmt.Println("Error reader passed output to channel:", reader.Text())
+		}
 	}
 }
 
@@ -100,7 +112,12 @@ func (cs *ChromeSession) Write(s string) {
 // closeWhenCompleted closes ouput channels to cause readers to
 // end gracefully when the command completes
 func (cs *ChromeSession) closeWhenCompleted() {
+	defer cs.forceClose() // when complete, make sure the PID dies (it never does on its own)
+
 	cs.cmd.Wait()
+	if Debug {
+		fmt.Println("Command exited. Closing channels.")
+	}
 	close(cs.Output)
 }
 
@@ -135,19 +152,19 @@ func NewChromeSession(url string) (*ChromeSession, error) {
 	}
 
 	// bind sessions to struct
-	session.output = outPipe
-	session.input = inPipe
-	session.cliError = errPipe
+	session.stdOut = outPipe
+	session.stdIn = inPipe
+	session.stdErr = errPipe
 
 	// make channels for communication
 	session.Input = make(chan string, 1)
 	session.Output = make(chan string, 5000)
 
 	if Debug {
-		fmt.Println("Starting command:", session.cmd.Path, session.cmd.Args)
+		fmt.Println("Starting command:", session.cmd.Args)
 	}
 
-	// kick off the command
+	// kick off the command and ensure it closes when done
 	err = session.cmd.Start()
 	if err != nil {
 		return &session, err
@@ -166,4 +183,9 @@ func NewChromeSession(url string) (*ChromeSession, error) {
 	// command is online and healthy, return to the user
 	return &session, err
 
+}
+
+// forceClose issues a force kill to the command
+func (cs *ChromeSession) forceClose() {
+	cs.cmd.Process.Kill()
 }
