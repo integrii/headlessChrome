@@ -35,8 +35,8 @@ func (cs *ChromeSession) writeString(s string) error {
 	if Debug {
 		fmt.Println("Writing string:", s)
 	}
-	// len, err := io.WriteString(cs.stdIn, s)
-	_, err := cs.pty.WriteString(s + "\r\n")
+	_, err := io.WriteString(cs.stdIn, s+"\r\n")
+	// _, err := cs.pty.WriteString(s + "\r\n")
 	return err
 }
 
