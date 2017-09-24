@@ -3,25 +3,26 @@ package headlessChrome
 import (
 	"fmt"
 	"testing"
-	"time"
 )
 
 // TestHTTPScrape tests a scrape from content on httpbin.org
 func TestHTTPScrape(t *testing.T) {
+
+	Debug = true
+
+	// make a new session
 	session, err := NewChromeSession("http://google.com")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	// write to the session
-	session.Input <- "console.log(\"DEBUG\")"
+	session.Write(`console.log("DEBUG")`)
+	session.Exit()
 
-	time.Sleep(time.Second * 2)
-
-	t.Log(len(session.Output))
-
+	// write to the session and issue an exit
 	for l := range session.Output {
-		fmt.Println(l)
+		t.Log("Output:", l)
+		fmt.Println("Output:", l)
 	}
 
 	// b, err := ioutil.ReadAll(session.CLIError)
