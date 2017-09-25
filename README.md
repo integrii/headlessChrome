@@ -36,12 +36,17 @@ time.Sleep(time.Second * 5)
 // Write all the HTML from the web site:
 browser.Write(`document.documentElement.outerHTML`)
 
+// range over all the output that comes from the browser with the string reader package
+for len(browser.Session.Output) > 0 {
+  fmt.Println(<-browser.Session.Output)
+}
+
 // click some span element from the page by its text content
 browser.ClickItemWithInnerHTML("span", "Google Search")
 
-// range over all the output that comes from the browser with the string reader package
-for l := range browser.Session.Output {
-  fmt.Println(l)
+// drain all the output so we can pay attention to the next line
+for len(c) > 0 {
+  <-c
 }
 
 // select the content of something by its css classes
