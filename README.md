@@ -42,7 +42,7 @@ for len(browser.Session.Output) > 0 {
 }
 
 // click some span element from the page by its text content
-browser.ClickItemWithInnerHTML("span", "Google Search")
+browser.ClickItemWithInnerHTML("span", "Google Search",0)
 
 // drain all the output so we can pay attention to the next line
 for len(c) > 0 {
@@ -50,7 +50,7 @@ for len(c) > 0 {
 }
 
 // select the content of something by its css classes
-browser.GetContentOfItemWithClasses("button arrow bold")
+browser.GetContentOfItemWithClasses("button arrow bold",0)
 
 // read the selected stuff from the console by picking the next item from the channel
 consoleOut := <- browser.Session.Output

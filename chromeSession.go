@@ -2,6 +2,7 @@ package headlessChrome
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/integrii/interactive"
 )
@@ -61,19 +62,19 @@ func (cs *ChromeSession) ClickSelector(s string) {
 }
 
 // ClickItemWithInnerHTML clicks an item that has the matching inner html
-func (cs *ChromeSession) ClickItemWithInnerHTML(elementType string, s string) {
-	cs.Write(`var spans = $("` + elementType + `").filter(function(idx) { return this.innerHTML.indexOf("` + s + `") == 0; }); spans[0].click()`)
+func (cs *ChromeSession) ClickItemWithInnerHTML(elementType string, s string, itemIndex int) {
+	cs.Write(`var spans = $("` + elementType + `").filter(function(idx) { return this.innerHTML.indexOf("` + s + `") == 0; }); spans[` + strconv.Itoa(itemIndex) + `].click()`)
 }
 
 // GetContentOfItemWithClasses fetches the content of the element with the specified classes
-func (cs *ChromeSession) GetContentOfItemWithClasses(classes string) {
-	cs.Write(`var x = document.getElementsByClassName("` + classes + `");x[0].innerHTML`)
+func (cs *ChromeSession) GetContentOfItemWithClasses(classes string, itemIndex int) {
+	cs.Write(`var x = document.getElementsByClassName("` + classes + `");x[` + strconv.Itoa(itemIndex) + `].innerHTML`)
 }
 
 // ClickItemWithClasses clicks on the first item it finds with the provided classes.
 // Multiple classes are separated by spaces
-func (cs *ChromeSession) ClickItemWithClasses(classes string) {
-	cs.Write(`var x = document.getElementsByClassName("` + classes + `");x[0].click()`)
+func (cs *ChromeSession) ClickItemWithClasses(classes string, itemIndex int) {
+	cs.Write(`var x = document.getElementsByClassName("` + classes + `");x[` + strconv.Itoa(itemIndex) + `].click()`)
 }
 
 // NewBrowser starts a new chrome headless Session.
