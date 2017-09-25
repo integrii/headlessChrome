@@ -9,8 +9,8 @@ import (
 // Debug enables debug output for this package to console
 var Debug bool
 
-// ChromeCommand is the command to execute chrome
-var ChromeCommand = `/Applications/Google Chrome.app/Contents/MacOS/Google Chrome`
+// ChromePath is the command to execute chrome
+var ChromePath = `/Applications/Google Chrome.app/Contents/MacOS/Google Chrome`
 
 // Args are the args that will be used to start chrome
 var Args = []string{
@@ -76,15 +76,15 @@ func (cs *ChromeSession) ClickItemWithClasses(classes string) {
 	cs.Write(`var x = document.getElementsByClassName("` + classes + `");x[0].click()`)
 }
 
-// NewChromeSession starts a new chrome headless session.
-func NewChromeSession(url string) (*ChromeSession, error) {
+// NewBrowser starts a new chrome headless session.
+func NewBrowser(url string) (*ChromeSession, error) {
 	var err error
 
 	chromeSession := ChromeSession{}
 
 	// add url as last arg and create new session
 	args := append(Args, url)
-	chromeSession.session, err = interactive.NewSession(ChromeCommand, args)
+	chromeSession.session, err = interactive.NewSession(ChromePath, args)
 
 	return &chromeSession, err
 }
