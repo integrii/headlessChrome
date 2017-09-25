@@ -1,9 +1,9 @@
 # headlessChrome 🤖
 **MacOS only for now.**  😬
 
-A [go](https://golang.org) package for working with headless Chrome.  Run interactive JavaScript commands on pages with go and Chrome without a GUI.  Includes a few helpful functions out of the box to query and click selectors paths by their classes or content (innerHTML).
+A [go](https://golang.org) package for working with headless Chrome.  Run interactive JavaScript commands on pages with go and Chrome without a GUI.  Includes a few helpful functions out of the box to query and click selector paths by their classes or content (innerHTML).
 
-You could use this package to click buttons and scrape content on/from a website as if you were a browser, or to render pages that wouldn't be supported by other things like phantomjs or casperjs.  Like sites that use EmberJS, where the content is rendered by javascript after the HTML payload is delivered.
+You could use this package to click buttons and scrape content on/from a website as if you were a browser, or to render pages that wouldn't be supported by other things like phantomjs or casperjs.  Especially useful for sites that use EmberJS, where the content is rendered by javascript after the HTML payload is delivered.
 
 
 #### Documentation
