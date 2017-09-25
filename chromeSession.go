@@ -65,6 +65,17 @@ func (cs *ChromeSession) ClickItemWithInnerHTML(elementType string, s string) {
 	cs.Write(`var spans = $("` + elementType + `").filter(function(idx) { return this.innerHTML.indexOf("` + s + `") == 0; }); spans[0].click()`)
 }
 
+// GetContentOfItemWithClasse fetches the content of the element with the specified classes
+func (cs *ChromeSession) GetContentOfItemWithClasse(classes string) {
+	cs.Write(`var x = document.getElementsByClassName("` + classes + `");x[0].innerHTML`)
+}
+
+// ClickItemWithClasses clicks on the first item it finds with the provided classes.
+// Multiple classes are separated by spaces
+func (cs *ChromeSession) ClickItemWithClasses(classes string) {
+	cs.Write(`var x = document.getElementsByClassName("` + classes + `");x[0].click()`)
+}
+
 // NewChromeSession starts a new chrome headless session.
 func NewChromeSession(url string) (*ChromeSession, error) {
 	var err error

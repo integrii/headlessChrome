@@ -24,19 +24,20 @@ func TestFetchAvailability(t *testing.T) {
 	time.Sleep(time.Second * 1)
 
 	// click add one adult plus button
-	chromeSession.ClickSelector(`#ember479 > div.ui.fluid.form > div > div:nth-child(1) > div > div.ui.green.icon.button > i`)
+	chromeSession.ClickItemWithClasses("plus icon")
 	time.Sleep(time.Second * 1)
 
 	// click choose times
-	chromeSession.ClickSelector(`#ember479 > div.ui.right.floated.huge.primary.button`)
+	chromeSession.ClickItemWithClasses("ui right floated huge primary button")
 	time.Sleep(time.Second * 1)
 
 	// click the choose times calendar dropdown
-	chromeSession.ClickSelector(`#ember607`)
+	chromeSession.ClickItemWithClasses("ember-view ember-text-field datepicker picker__input")
 	time.Sleep(time.Second * 1)
 
 	// fetch the month on the calendar
-	chromeSession.Write(`document.querySelector("#ember607_root > div > div > div > div > div.picker__header > div.picker__month").textContent`)
+	chromeSession.GetContentOfItemWithClasse("picker__month")
+	time.Sleep(time.Second * 1)
 
 	// exit
 	chromeSession.Exit()
