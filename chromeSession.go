@@ -15,6 +15,10 @@ var Args = []string{
 	"--headless",
 	"--disable-gpu",
 	"--repl",
+	// "--dump-dom",
+	// "--window-size=1024,768",
+	// "--user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36",
+	// "--verbose",
 }
 
 const expectedFirstLine = "Type a Javascript expression to evaluate or \"quit\" to exit."
@@ -39,19 +43,20 @@ func (cs *ChromeSession) Write(s string) {
 	cs.session.Write(s)
 }
 
+// forceClose issues a force kill to the command
+func (cs *ChromeSession) forceClose() {
+	cs.session.ForceClose()
+}
+
 // NewChromeSession starts a new chrome headless session.
 func NewChromeSession(url string) (*ChromeSession, error) {
-	var chromeSession *ChromeSession
 	var err error
+
+	chromeSession := ChromeSession{}
 
 	// add url as last arg and create new session
 	args := append(Args, url)
 	chromeSession.session, err = interactive.NewSession(ChromeCommand, args)
 
-	return chromeSession, err
-}
-
-// forceClose issues a force kill to the command
-func (cs *ChromeSession) forceClose() {
-	cs.session.ForceClose()
+	return &chromeSession, err
 }
