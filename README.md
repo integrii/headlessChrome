@@ -40,7 +40,7 @@ browser.Write(`document.documentElement.outerHTML`)
 browser.ClickItemWithInnerHTML("span", "Google Search")
 
 // range over all the output that comes from the browser with the string reader package
-for l := range browser.session.Output {
+for l := range browser.Session.Output {
   fmt.Println(l)
 }
 
@@ -48,7 +48,7 @@ for l := range browser.session.Output {
 browser.GetContentOfItemWithClasses("button arrow bold")
 
 // read the selected stuff from the console by picking the next item from the channel
-consoleOut := <- browser.session.Output
+consoleOut := <- browser.Session.Output
 fmt.Println(consoleOut)
 
 // End the session by writing quit

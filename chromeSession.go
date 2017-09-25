@@ -25,34 +25,34 @@ var Args = []string{
 
 const expectedFirstLine = "Type a Javascript expression to evaluate or \"quit\" to exit."
 
-// ChromeSession is an interactive console session with a Chrome
+// ChromeSession is an interactive console Session with a Chrome
 // instance.
 type ChromeSession struct {
-	session *interactive.Session
+	Session *interactive.Session
 }
 
 // Exit exits the running command out by ossuing a 'quit'
 // to the chrome console
 func (cs *ChromeSession) Exit() {
-	cs.session.Write(`quit`)
-	cs.session.Exit()
+	cs.Session.Write(`quit`)
+	cs.Session.Exit()
 }
 
 // Write writes to the Session
 func (cs *ChromeSession) Write(s string) {
-	cs.session.Write(s)
+	cs.Session.Write(s)
 }
 
 // OutputPrinter prints all outputs from the output channel to the cli
 func (cs *ChromeSession) OutputPrinter() {
-	for l := range cs.session.Output {
+	for l := range cs.Session.Output {
 		fmt.Println(l)
 	}
 }
 
 // forceClose issues a force kill to the command
 func (cs *ChromeSession) forceClose() {
-	cs.session.ForceClose()
+	cs.Session.ForceClose()
 }
 
 // ClickSelector calls a click() on the supplied selector
@@ -76,15 +76,15 @@ func (cs *ChromeSession) ClickItemWithClasses(classes string) {
 	cs.Write(`var x = document.getElementsByClassName("` + classes + `");x[0].click()`)
 }
 
-// NewBrowser starts a new chrome headless session.
+// NewBrowser starts a new chrome headless Session.
 func NewBrowser(url string) (*ChromeSession, error) {
 	var err error
 
 	chromeSession := ChromeSession{}
 
-	// add url as last arg and create new session
+	// add url as last arg and create new Session
 	args := append(Args, url)
-	chromeSession.session, err = interactive.NewSession(ChromePath, args)
+	chromeSession.Session, err = interactive.NewSession(ChromePath, args)
 
 	return &chromeSession, err
 }

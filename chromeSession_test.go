@@ -12,7 +12,7 @@ func TestMainPageScrape(t *testing.T) {
 
 	Debug = false
 
-	// make a new session
+	// make a new Session
 	chrome, err := NewBrowser(`google.com`)
 	if err != nil {
 		t.Fatal(err)
@@ -22,16 +22,16 @@ func TestMainPageScrape(t *testing.T) {
 	chrome.Write(`document.documentElement.outerHTML`)
 	chrome.Exit()
 
-	// write to the session and issue an exit
+	// write to the Session and issue an exit
 	var googleFound bool
-	for l := range chrome.session.Output {
+	for l := range chrome.Session.Output {
 		if strings.Contains(l, "google") {
 			googleFound = true
 		}
 		fmt.Println(l)
 	}
 
-	// b, err := ioutil.ReadAll(session.CLIError)
+	// b, err := ioutil.ReadAll(Session.CLIError)
 	// if err != nil {
 	// 	t.Fatal(err)
 	// }
