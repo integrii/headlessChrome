@@ -65,8 +65,8 @@ func (cs *ChromeSession) ClickItemWithInnerHTML(elementType string, s string) {
 	cs.Write(`var spans = $("` + elementType + `").filter(function(idx) { return this.innerHTML.indexOf("` + s + `") == 0; }); spans[0].click()`)
 }
 
-// GetContentOfItemWithClasse fetches the content of the element with the specified classes
-func (cs *ChromeSession) GetContentOfItemWithClasse(classes string) {
+// GetContentOfItemWithClasses fetches the content of the element with the specified classes
+func (cs *ChromeSession) GetContentOfItemWithClasses(classes string) {
 	cs.Write(`var x = document.getElementsByClassName("` + classes + `");x[0].innerHTML`)
 }
 
