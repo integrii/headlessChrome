@@ -1,6 +1,8 @@
 package headlessChrome
 
 import (
+	"fmt"
+
 	"github.com/integrii/interactive"
 )
 
@@ -33,9 +35,7 @@ type ChromeSession struct {
 // to the chrome console
 func (cs *ChromeSession) Exit() {
 	cs.session.Write(`quit`)
-
-	// close will cause the io workers to stop gracefully
-	close(cs.session.Input)
+	cs.session.Exit()
 }
 
 // Write writes to the Session
@@ -43,9 +43,26 @@ func (cs *ChromeSession) Write(s string) {
 	cs.session.Write(s)
 }
 
+// OutputPrinter prints all outputs from the output channel to the cli
+func (cs *ChromeSession) OutputPrinter() {
+	for l := range cs.session.Output {
+		fmt.Println(l)
+	}
+}
+
 // forceClose issues a force kill to the command
 func (cs *ChromeSession) forceClose() {
 	cs.session.ForceClose()
+}
+
+// ClickSelector calls a click() on the supplied selector
+func (cs *ChromeSession) ClickSelector(s string) {
+	cs.Write(`document.querySelector("` + s + `").click()`)
+}
+
+// ClickItemWithInnerHTML clicks an item that has the matching inner html
+func (cs *ChromeSession) ClickItemWithInnerHTML(elementType string, s string) {
+	cs.Write(`var spans = $("` + elementType + `").filter(function(idx) { return this.innerHTML.indexOf("` + s + `") == 0; }); spans[0].click()`)
 }
 
 // NewChromeSession starts a new chrome headless session.
