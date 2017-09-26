@@ -57,6 +57,10 @@ func (cs *ChromeSession) Exit() {
 
 // Write writes to the Session
 func (cs *ChromeSession) Write(s string) {
+	if Debug {
+		fmt.Println("Writing to console:")
+		fmt.Println(s)
+	}
 	cs.Session.Write(s)
 }
 
