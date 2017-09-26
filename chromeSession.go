@@ -2,7 +2,9 @@ package headlessChrome
 
 import (
 	"fmt"
+	"log"
 	"strconv"
+	"strings"
 
 	"github.com/integrii/interactive"
 )
@@ -24,7 +26,19 @@ var Args = []string{
 	// "--verbose",
 }
 
-const expectedFirstLine = "Type a Javascript expression to evaluate or \"quit\" to exit."
+const expectedFirstLine = `Type a Javascript expression to evaluate or "quit" to exit.`
+const promptPrefix = `>>>`
+
+// OutputSanitizer puts output coming from the consolw that
+// does not begin with the input prompt into the session
+// output channel
+func (cs *ChromeSession) OutputSanitizer() {
+	for text := range cs.Session.Output {
+		if !strings.HasPrefix(text, promptPrefix) {
+			cs.Output <- text
+		}
+	}
+}
 
 // ChromeSession is an interactive console Session with a Chrome
 // instance.
@@ -109,14 +123,21 @@ func NewBrowser(url string) (*ChromeSession, error) {
 	var err error
 
 	chromeSession := ChromeSession{}
+	chromeSession.Output = make(chan string, 5000)
 
 	// add url as last arg and create new Session
 	args := append(Args, url)
 	chromeSession.Session, err = interactive.NewSession(ChromePath, args)
 
 	// map output and input channels for easy use
-	chromeSession.Output = chromeSession.Session.Output
 	chromeSession.Input = chromeSession.Session.Input
+
+	go chromeSession.OutputSanitizer()
+
+	firstLine := <-chromeSession.Output
+	if !strings.Contains(firstLine, expectedFirstLine) {
+		log.Println("ERROR: Unespected first line when initializing headless Chrome console:", firstLine)
+	}
 
 	return &chromeSession, err
 }
