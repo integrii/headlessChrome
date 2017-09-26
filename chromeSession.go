@@ -77,6 +77,21 @@ func (cs *ChromeSession) ClickItemWithClasses(classes string, itemIndex int) {
 	cs.Write(`var x = document.getElementsByClassName("` + classes + `");x[` + strconv.Itoa(itemIndex) + `].click()`)
 }
 
+// SetTextByID sets the text on the div with the specified id
+func (cs *ChromeSession) SetTextByID(divID string, itemIndex int, text string) {
+	cs.Write(`var x = document.getElementsById("` + divID + `");x[` + strconv.Itoa(itemIndex) + `].innerHTML = "` + text + `"`)
+}
+
+// SetTextByClasses sets the text on the div with the specified id
+func (cs *ChromeSession) SetTextByClasses(classes string, itemIndex int, text string) {
+	cs.Write(`var x = document.getElementsByClassName("` + classes + `");x[` + strconv.Itoa(itemIndex) + `].innerHTML = "` + text + `"`)
+}
+
+// SetInputTextByClasses sets the input text for an input field
+func (cs *ChromeSession) SetInputTextByClasses(classes string, itemIndex int, text string) {
+	cs.Write(`var x = document.getElementsByClassName("` + classes + `");x[` + strconv.Itoa(itemIndex) + `].value = "` + text + `"`)
+}
+
 // NewBrowser starts a new chrome headless Session.
 func NewBrowser(url string) (*ChromeSession, error) {
 	var err error
