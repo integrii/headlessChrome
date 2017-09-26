@@ -30,6 +30,8 @@ const expectedFirstLine = "Type a Javascript expression to evaluate or \"quit\" 
 // instance.
 type ChromeSession struct {
 	Session *interactive.Session
+	Output  chan string
+	Input   chan string
 }
 
 // Exit exits the running command out by ossuing a 'quit'
@@ -71,6 +73,11 @@ func (cs *ChromeSession) GetContentOfItemWithClasses(classes string, itemIndex i
 	cs.Write(`var x = document.getElementsByClassName("` + classes + `");x[` + strconv.Itoa(itemIndex) + `].innerHTML`)
 }
 
+// GetContentOfItemWithSelector gets the content of an element with the specified selector
+func (cs *ChromeSession) GetContentOfItemWithSelector(selector string) {
+	cs.Write(`document.querySelector("` + selector + `").innerHTML()`)
+}
+
 // ClickItemWithClasses clicks on the first item it finds with the provided classes.
 // Multiple classes are separated by spaces
 func (cs *ChromeSession) ClickItemWithClasses(classes string, itemIndex int) {
@@ -78,8 +85,13 @@ func (cs *ChromeSession) ClickItemWithClasses(classes string, itemIndex int) {
 }
 
 // SetTextByID sets the text on the div with the specified id
-func (cs *ChromeSession) SetTextByID(divID string, itemIndex int, text string) {
-	cs.Write(`var x = document.getElementsById("` + divID + `");x[` + strconv.Itoa(itemIndex) + `].innerHTML = "` + text + `"`)
+func (cs *ChromeSession) SetTextByID(id string, text string) {
+	cs.Write(`document.getElementById("` + id + `").innerHTML = "` + text + `"`)
+}
+
+// ClickItemWithID clicks an item with the specified id
+func (cs *ChromeSession) ClickItemWithID(id string) {
+	cs.Write(`document.getElementById("` + id + `").click()`)
 }
 
 // SetTextByClasses sets the text on the div with the specified id
@@ -101,6 +113,10 @@ func NewBrowser(url string) (*ChromeSession, error) {
 	// add url as last arg and create new Session
 	args := append(Args, url)
 	chromeSession.Session, err = interactive.NewSession(ChromePath, args)
+
+	// map output and input channels for easy use
+	chromeSession.Output = chromeSession.Session.Output
+	chromeSession.Input = chromeSession.Session.Input
 
 	return &chromeSession, err
 }
