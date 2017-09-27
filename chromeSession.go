@@ -83,17 +83,17 @@ func (cs *ChromeSession) ClickSelector(s string) {
 
 // ClickItemWithInnerHTML clicks an item that has the matching inner html
 func (cs *ChromeSession) ClickItemWithInnerHTML(elementType string, s string, itemIndex int) {
-	cs.Write(`var spans = $("` + elementType + `").filter(function(idx) { return this.innerHTML.indexOf("` + s + `") == 0; }); spans[` + strconv.Itoa(itemIndex) + `].click()`)
+	cs.Write(`$("` + elementType + `").filter(function(idx) { return this.innerHTML.indexOf("` + s + `") == 0; })[` + strconv.Itoa(itemIndex) + `].click()`)
 }
 
 // GetItemWithInnerHTML fetches the item with the specified innerHTML content
 func (cs *ChromeSession) GetItemWithInnerHTML(elementType string, s string, itemIndex int) {
-	cs.Write(`var items = $("` + elementType + `").filter(function(idx) { return this.innerHTML.indexOf("` + s + `") == 0; }); items[` + strconv.Itoa(itemIndex) + `]`)
+	cs.Write(`$("` + elementType + `").filter(function(idx) { return this.innerHTML.indexOf("` + s + `") == 0; })[` + strconv.Itoa(itemIndex) + `]`)
 }
 
 // GetContentOfItemWithClasses fetches the content of the element with the specified classes
 func (cs *ChromeSession) GetContentOfItemWithClasses(classes string, itemIndex int) {
-	cs.Write(`var x = document.getElementsByClassName("` + classes + `");x[` + strconv.Itoa(itemIndex) + `].innerHTML`)
+	cs.Write(`document.getElementsByClassName("` + classes + `")[` + strconv.Itoa(itemIndex) + `].innerHTML`)
 }
 
 // GetContentOfItemWithSelector gets the content of an element with the specified selector
@@ -104,7 +104,7 @@ func (cs *ChromeSession) GetContentOfItemWithSelector(selector string) {
 // ClickItemWithClasses clicks on the first item it finds with the provided classes.
 // Multiple classes are separated by spaces
 func (cs *ChromeSession) ClickItemWithClasses(classes string, itemIndex int) {
-	cs.Write(`var x = document.getElementsByClassName("` + classes + `");x[` + strconv.Itoa(itemIndex) + `].click()`)
+	cs.Write(`document.getElementsByClassName("` + classes + `")[` + strconv.Itoa(itemIndex) + `].click()`)
 }
 
 // SetTextByID sets the text on the div with the specified id
