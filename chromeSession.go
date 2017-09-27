@@ -119,12 +119,12 @@ func (cs *ChromeSession) ClickItemWithID(id string) {
 
 // SetTextByClasses sets the text on the div with the specified id
 func (cs *ChromeSession) SetTextByClasses(classes string, itemIndex int, text string) {
-	cs.Write(`var x = document.getElementsByClassName("` + classes + `");x[` + strconv.Itoa(itemIndex) + `].innerHTML = "` + text + `"`)
+	cs.Write(`document.getElementsByClassName("` + classes + `")[` + strconv.Itoa(itemIndex) + `].innerHTML = "` + text + `"`)
 }
 
 // SetInputTextByClasses sets the input text for an input field
 func (cs *ChromeSession) SetInputTextByClasses(classes string, itemIndex int, text string) {
-	cs.Write(`var x = document.getElementsByClassName("` + classes + `");x[` + strconv.Itoa(itemIndex) + `].value = "` + text + `"`)
+	cs.Write(`document.getElementsByClassName("` + classes + `")[` + strconv.Itoa(itemIndex) + `].value = "` + text + `"`)
 }
 
 // NewBrowser starts a new chrome headless Session.
