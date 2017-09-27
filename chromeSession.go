@@ -96,6 +96,11 @@ func (cs *ChromeSession) GetContentOfItemWithClasses(classes string, itemIndex i
 	cs.Write(`document.getElementsByClassName("` + classes + `")[` + strconv.Itoa(itemIndex) + `].innerHTML`)
 }
 
+// GetValueOfItemWithClasses returns the form value of the specified item
+func (cs *ChromeSession) GetValueOfItemWithClasses(classes string, itemIndex int) {
+	cs.Write(`document.getElementsByClassName("` + classes + `")[` + strconv.Itoa(itemIndex) + `].value`)
+}
+
 // GetContentOfItemWithSelector gets the content of an element with the specified selector
 func (cs *ChromeSession) GetContentOfItemWithSelector(selector string) {
 	cs.Write(`document.querySelector("` + selector + `").innerHTML()`)
