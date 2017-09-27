@@ -83,12 +83,12 @@ func (cs *ChromeSession) ClickSelector(s string) {
 
 // ClickItemWithInnerHTML clicks an item that has the matching inner html
 func (cs *ChromeSession) ClickItemWithInnerHTML(elementType string, s string, itemIndex int) {
-	cs.Write(`$("` + elementType + `").filter(function(idx) { return this.innerHTML.indexOf("` + s + `") == 0; })[` + strconv.Itoa(itemIndex) + `].click()`)
+	cs.Write(`var x = $("` + elementType + `").filter(function(idx) { return this.innerHTML.indexOf("` + s + `") == 0; });x[` + strconv.Itoa(itemIndex) + `].click()`)
 }
 
 // GetItemWithInnerHTML fetches the item with the specified innerHTML content
 func (cs *ChromeSession) GetItemWithInnerHTML(elementType string, s string, itemIndex int) {
-	cs.Write(`$("` + elementType + `").filter(function(idx) { return this.innerHTML.indexOf("` + s + `") == 0; })[` + strconv.Itoa(itemIndex) + `]`)
+	cs.Write(`var x = $("` + elementType + `").filter(function(idx) { return this.innerHTML.indexOf("` + s + `") == 0; });x[` + strconv.Itoa(itemIndex) + `]`)
 }
 
 // GetContentOfItemWithClasses fetches the content of the element with the specified classes
