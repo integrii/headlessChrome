@@ -13,6 +13,10 @@ import (
 // Debug enables debug output for this package to console
 var Debug bool
 
+// BrowserStartupTime is how long chrome has to startup the console
+// before we consider it a failure
+var BrowserStartupTime = time.Minute
+
 // ChromePath is the command to execute chrome
 var ChromePath = `/Applications/Google Chrome.app/Contents/MacOS/Google Chrome`
 
@@ -151,9 +155,16 @@ func NewBrowserWithTimeout(url string, timeout time.Duration) (*ChromeSession, e
 
 	go chromeSession.OutputSanitizer()
 
-	firstLine := <-chromeSession.Output
-	if !strings.Contains(firstLine, expectedFirstLine) {
-		log.Println("ERROR: Unespected first line when initializing headless Chrome console:", firstLine)
+	// wait for the console ready line from the browser
+	// and if it does not start in time, move on
+	select {
+	case firstLine := <-chromeSession.Output:
+		if !strings.Contains(firstLine, expectedFirstLine) {
+			log.Println("ERROR: Unespected first line when initializing headless Chrome console:", firstLine)
+		}
+	case <-time.After(BrowserStartupTime):
+		log.Println("ERROR: Browser failed to start before browser startup time cutoff")
+		chromeSession.forceClose() // force cloe the session because it failed
 	}
 
 	return &chromeSession, err
