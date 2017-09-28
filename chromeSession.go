@@ -149,6 +149,9 @@ func NewBrowserWithTimeout(url string, timeout time.Duration) (*ChromeSession, e
 	// add url as last arg and create new Session
 	args := append(Args, url)
 	chromeSession.Session, err = interactive.NewSessionWithTimeout(ChromePath, args, timeout)
+	if err != nil {
+		return &chromeSession, err
+	}
 
 	// map output and input channels for easy use
 	chromeSession.Input = chromeSession.Session.Input
