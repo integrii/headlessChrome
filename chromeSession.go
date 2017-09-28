@@ -1,6 +1,7 @@
 package headlessChrome
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"strconv"
@@ -168,6 +169,7 @@ func NewBrowserWithTimeout(url string, timeout time.Duration) (*ChromeSession, e
 	case <-time.After(BrowserStartupTime):
 		log.Println("ERROR: Browser failed to start before browser startup time cutoff")
 		chromeSession.forceClose() // force cloe the session because it failed
+		err = errors.New("Chrome console failed to init in the alotted time")
 	}
 
 	return &chromeSession, err
