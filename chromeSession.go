@@ -5,6 +5,7 @@ import (
 	"log"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/integrii/interactive"
 )
@@ -132,8 +133,10 @@ func (cs *ChromeSession) SetInputTextByClasses(classes string, itemIndex int, te
 	cs.Write(`document.getElementsByClassName("` + classes + `")[` + strconv.Itoa(itemIndex) + `].value = "` + text + `"`)
 }
 
-// NewBrowser starts a new chrome headless Session.
-func NewBrowser(url string) (*ChromeSession, error) {
+// NewBrowserWithTimeout starts a new chrome headless session
+// but limits how long it can run before its killed forcefully.
+// A time limit of 0 means there is not a time limit
+func NewBrowserWithTimeout(url string, timeout time.Duration) (*ChromeSession, error) {
 	var err error
 
 	chromeSession := ChromeSession{}
@@ -141,7 +144,7 @@ func NewBrowser(url string) (*ChromeSession, error) {
 
 	// add url as last arg and create new Session
 	args := append(Args, url)
-	chromeSession.Session, err = interactive.NewSession(ChromePath, args)
+	chromeSession.Session, err = interactive.NewSessionWithTimeout(ChromePath, args, timeout)
 
 	// map output and input channels for easy use
 	chromeSession.Input = chromeSession.Session.Input
@@ -154,4 +157,9 @@ func NewBrowser(url string) (*ChromeSession, error) {
 	}
 
 	return &chromeSession, err
+}
+
+// NewBrowser starts a new chrome headless Session.
+func NewBrowser(url string) (*ChromeSession, error) {
+	return NewBrowserWithTimeout(url, 0)
 }
