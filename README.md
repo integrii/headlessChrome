@@ -5,6 +5,8 @@ A [go](https://golang.org) package for working with headless Chrome.  Run intera
 
 You could use this package to click buttons and scrape content on/from a website as if you were a browser, or to render pages that wouldn't be supported by other things like phantomjs or casperjs.  Especially useful for sites that use EmberJS, where the content is rendered by javascript after the HTML payload is delivered.
 
+#### Install
+`go get github.com/integrii/headlessChrome`
 
 #### Documentation
 [http://godoc.org/github.com/integrii/headlessChrome](http://godoc.org/github.com/integrii/headlessChrome)
@@ -18,9 +20,6 @@ headlessChrome.Args = append(headlessChrome.Args,"--window-size=1024,768")
 ```
 
 
-#### Install
-`go get github.com/integrii/headlessChrome`
-
 #### Example
 
 ```go
@@ -30,37 +29,35 @@ if err != nil {
   t.Fatal(err)
 }
 
-// sleep while content is rendered.  You could replace this with some javascript that only returns when the content exists.
+// sleep while content is rendered.  You could replace this
+// with some javascript that only returns when the
+// content exists to be safer.
 time.Sleep(time.Second * 5)
 
-// Write all the HTML from the web site:
+// Query all the HTML from the web site
 browser.Write(`document.documentElement.outerHTML`)
 
-// range over all the output that comes from the browser with the string reader package
-for len(browser.Session.Output) > 0 {
-  fmt.Println(<-browser.Session.Output)
+// loop over all the output that came from the ouput channel
+// and print it to the console
+for len(browser.Output) > 0 {
+  fmt.Println(<-browser.Output)
 }
 
 // click some span element from the page by its text content
 browser.ClickItemWithInnerHTML("span", "Google Search",0)
 
-// drain all the output so we can pay attention to the next line
-for len(c) > 0 {
-  <-c
-}
-
 // select the content of something by its css classes
 browser.GetContentOfItemWithClasses("button arrow bold",0)
 
-// read the selected stuff from the console by picking the next item from the channel
-consoleOut := <- browser.Session.Output
-fmt.Println(consoleOut)
+// read the selected stuff from the console by picking
+// the next item from the output channel
+fmt.Println(<- browser.Output)
 
-// End the session by writing quit
+// End the session by writing quit to the console
 browser.Exit()
 ```
 
 
 #### Contributing
 
-Please send pull requests!  It would be good to have support for more OSes or more handy helpers to run more commonly used javascript code easily.
+Please send pull requests!  It would be good to have support for more operating systems or more handy helpers to run more commonly used javascript code easily.  Adding support for other operating systems should be as simple as checking the platform type and changing the `ChromePath` variable's default value.
