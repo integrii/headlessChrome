@@ -179,5 +179,7 @@ func NewBrowser(url string) (*ChromeSession, error) {
 }
 
 func debug(s ...interface{}) {
-	fmt.Println(s...)
+	if Debug {
+		fmt.Println(s...)
+	}
 }
