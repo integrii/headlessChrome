@@ -63,10 +63,8 @@ func (cs *ChromeSession) Exit() {
 
 // Write writes to the Session
 func (cs *ChromeSession) Write(s string) {
-	if Debug {
-		fmt.Println("Writing to console:")
-		fmt.Println(s)
-	}
+	debug("Writing to console:")
+	debug(s)
 	cs.Session.Write(s)
 }
 
@@ -178,4 +176,8 @@ func NewBrowserWithTimeout(url string, timeout time.Duration) (*ChromeSession, e
 // NewBrowser starts a new chrome headless Session.
 func NewBrowser(url string) (*ChromeSession, error) {
 	return NewBrowserWithTimeout(url, 0)
+}
+
+func debug(s ...interface{}) {
+	fmt.Println(s...)
 }
