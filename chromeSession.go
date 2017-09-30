@@ -63,7 +63,6 @@ func (cs *ChromeSession) Exit() {
 
 // Write writes to the Session
 func (cs *ChromeSession) Write(s string) {
-	debug("Writing to console:")
 	debug(s)
 	cs.Session.Write(s)
 }
@@ -87,12 +86,12 @@ func (cs *ChromeSession) ClickSelector(s string) {
 
 // ClickItemWithInnerHTML clicks an item that has the matching inner html
 func (cs *ChromeSession) ClickItemWithInnerHTML(elementType string, s string, itemIndex int) {
-	cs.Write(`var x = $("` + elementType + `").filter(function(idx) { return this.innerHTML.indexOf("` + s + `") == 0; });x[` + strconv.Itoa(itemIndex) + `].click()`)
+	cs.Write(`var x = $("` + elementType + `").filter(function(idx) { return this.innerHTML == ` + s + `")});x[` + strconv.Itoa(itemIndex) + `].click()`)
 }
 
 // GetItemWithInnerHTML fetches the item with the specified innerHTML content
 func (cs *ChromeSession) GetItemWithInnerHTML(elementType string, s string, itemIndex int) {
-	cs.Write(`var x = $("` + elementType + `").filter(function(idx) { return this.innerHTML.indexOf("` + s + `") == 0; });x[` + strconv.Itoa(itemIndex) + `]`)
+	cs.Write(`var x = $("` + elementType + `").filter(function(idx) { return this.innerHTML == ` + s + `")});x[` + strconv.Itoa(itemIndex) + `]`)
 }
 
 // GetContentOfItemWithClasses fetches the content of the element with the specified classes
@@ -162,7 +161,7 @@ func NewBrowserWithTimeout(url string, timeout time.Duration) (*ChromeSession, e
 	select {
 	case firstLine := <-chromeSession.Output:
 		if !strings.Contains(firstLine, expectedFirstLine) {
-			log.Println("ERROR: Unespected first line when initializing headless Chrome console:", firstLine)
+			log.Println("WARNING: Unespected first line when initializing headless Chrome console:", firstLine)
 		}
 	case <-time.After(BrowserStartupTime):
 		log.Println("ERROR: Browser failed to start before browser startup time cutoff")
