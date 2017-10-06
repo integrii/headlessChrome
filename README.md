@@ -1,5 +1,5 @@
 # headlessChrome 🤖
-**MacOS and DOCKER Ubuntu only for now.**  😬
+**MacOS and Docker'd Ubuntu only for now.**  😬
 
 A [go](https://golang.org) package for working with headless Chrome.  Run interactive JavaScript commands on pages with go and Chrome without a GUI.  Includes a few helpful functions out of the box to query and click selector paths by their classes or content (innerHTML).
 
