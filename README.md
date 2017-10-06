@@ -22,8 +22,15 @@ headlessChrome.Args = append(headlessChrome.Args,"--user-agent=Mozilla/5.0 (Maci
 headlessChrome.Args = append(headlessChrome.Args,"--window-size=1024,768")
 ```
 
+##### Changing the Path to Chrome
 
-#### Example
+Change the path to Chrome by simply setting the `headlessChrome.ChromePath` variable.  
+```go
+headlessChrome.ChromePath = `/opt/google/chrome-unstable/chrome`
+```
+
+
+#### Mac Example
 
 ```go
 // make a new session
