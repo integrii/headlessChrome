@@ -3,7 +3,6 @@ package headlessChrome
 import (
 	"errors"
 	"fmt"
-	"log"
 	"strconv"
 	"strings"
 	"time"
@@ -16,10 +15,12 @@ var Debug bool
 
 // BrowserStartupTime is how long chrome has to startup the console
 // before we consider it a failure
-var BrowserStartupTime = time.Minute
+var BrowserStartupTime = time.Second * 20
 
 // ChromePath is the command to execute chrome
-var ChromePath = `/Applications/Google Chrome.app/Contents/MacOS/Google Chrome`
+var ChromePath = ChromePathMacOS
+var ChromePathMacOS = `/Applications/Google Chrome.app/Contents/MacOS/Google Chrome`
+var ChromePathDocker = `/opt/google/chrome-unstable/chrome`
 
 // Args are the args that will be used to start chrome
 var Args = []string{
@@ -35,11 +36,12 @@ var Args = []string{
 const expectedFirstLine = `Type a Javascript expression to evaluate or "quit" to exit.`
 const promptPrefix = `>>>`
 
-// OutputSanitizer puts output coming from the consolw that
+// outputSanitizer puts output coming from the consolw that
 // does not begin with the input prompt into the session
 // output channel
-func (cs *ChromeSession) OutputSanitizer() {
+func (cs *ChromeSession) outputSanitizer() {
 	for text := range cs.Session.Output {
+		debug("raw output:", text)
 		if !strings.HasPrefix(text, promptPrefix) {
 			cs.Output <- text
 		}
@@ -57,25 +59,26 @@ type ChromeSession struct {
 // Exit exits the running command out by ossuing a 'quit'
 // to the chrome console
 func (cs *ChromeSession) Exit() {
-	cs.Session.Write(`quit`)
+	cs.Session.Write(`;quit`)
 	cs.Session.Exit()
 }
 
 // Write writes to the Session
 func (cs *ChromeSession) Write(s string) {
-	debug(s)
+	debug("write:", s)
 	cs.Session.Write(s)
 }
 
-// OutputPrinter prints all outputs from the output channel to the cli
-func (cs *ChromeSession) OutputPrinter() {
+// outputPrinter prints all outputs from the output channel to the cli
+func (cs *ChromeSession) outputPrinter() {
 	for l := range cs.Session.Output {
+		debug("read:", l)
 		fmt.Println(l)
 	}
 }
 
-// forceClose issues a force kill to the command
-func (cs *ChromeSession) forceClose() {
+// ForceClose issues a force kill to the command
+func (cs *ChromeSession) ForceClose() {
 	cs.Session.ForceClose()
 }
 
@@ -141,11 +144,14 @@ func (cs *ChromeSession) SetInputTextByClasses(classes string, itemIndex int, te
 func NewBrowserWithTimeout(url string, timeout time.Duration) (*ChromeSession, error) {
 	var err error
 
+	debug("Creating a new browser pointed to", url)
+
 	chromeSession := ChromeSession{}
 	chromeSession.Output = make(chan string, 5000)
 
 	// add url as last arg and create new Session
 	args := append(Args, url)
+	debug(ChromePath, args)
 	chromeSession.Session, err = interactive.NewSessionWithTimeout(ChromePath, args, timeout)
 	if err != nil {
 		return &chromeSession, err
@@ -153,23 +159,26 @@ func NewBrowserWithTimeout(url string, timeout time.Duration) (*ChromeSession, e
 
 	// map output and input channels for easy use
 	chromeSession.Input = chromeSession.Session.Input
-
-	go chromeSession.OutputSanitizer()
+	go chromeSession.outputSanitizer()
 
 	// wait for the console ready line from the browser
-	// and if it does not start in time, move on
-	select {
-	case firstLine := <-chromeSession.Output:
-		if !strings.Contains(firstLine, expectedFirstLine) {
-			log.Println("WARNING: Unespected first line when initializing headless Chrome console:", firstLine)
+	// and if it does not start in time, throw an error
+	startupTime := time.NewTimer(BrowserStartupTime)
+	for {
+		select {
+		case <-startupTime.C:
+			debug("ERROR: Browser failed to start before browser startup time cutoff")
+			chromeSession.ForceClose() // force cloe the session because it failed
+			err = errors.New("Chrome console failed to init in the alotted time")
+			return &chromeSession, err
+		case line := <-chromeSession.Output:
+			if strings.Contains(line, expectedFirstLine) {
+				debug("Chrome console REPL ready")
+				return &chromeSession, err
+			}
+			debug("WARNING: Unespected first line when initializing headless Chrome console:", line)
 		}
-	case <-time.After(BrowserStartupTime):
-		log.Println("ERROR: Browser failed to start before browser startup time cutoff")
-		chromeSession.forceClose() // force cloe the session because it failed
-		err = errors.New("Chrome console failed to init in the alotted time")
 	}
-
-	return &chromeSession, err
 }
 
 // NewBrowser starts a new chrome headless Session.

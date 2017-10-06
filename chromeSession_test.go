@@ -1,7 +1,6 @@
 package headlessChrome
 
 import (
-	"fmt"
 	"strings"
 	"testing"
 	"time"
@@ -10,7 +9,7 @@ import (
 // TestMainPageScrape tests a scrape from content on httpbin.org
 func TestMainPageScrape(t *testing.T) {
 
-	Debug = false
+	Debug = true
 
 	// make a new Session
 	chrome, err := NewBrowser(`google.com`)
@@ -24,18 +23,12 @@ func TestMainPageScrape(t *testing.T) {
 
 	// write to the Session and issue an exit
 	var googleFound bool
-	for l := range chrome.Session.Output {
+	for l := range chrome.Output {
 		if strings.Contains(l, "google") {
 			googleFound = true
 		}
-		fmt.Println(l)
+		t.Log(l)
 	}
-
-	// b, err := ioutil.ReadAll(Session.CLIError)
-	// if err != nil {
-	// 	t.Fatal(err)
-	// }
-	// t.Log(string(b))
 
 	if !googleFound {
 		t.Fatal("Didnt find google in the output")

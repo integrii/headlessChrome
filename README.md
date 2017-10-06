@@ -1,5 +1,5 @@
 # headlessChrome 🤖
-**MacOS only for now.**  😬
+**MacOS and DOCKER Ubuntu only for now.**  😬
 
 A [go](https://golang.org) package for working with headless Chrome.  Run interactive JavaScript commands on pages with go and Chrome without a GUI.  Includes a few helpful functions out of the box to query and click selector paths by their classes or content (innerHTML).
 
@@ -10,6 +10,9 @@ You could use this package to click buttons and scrape content on/from a website
 
 #### Documentation
 [http://godoc.org/github.com/integrii/headlessChrome](http://godoc.org/github.com/integrii/headlessChrome)
+
+##### Docker Version
+To run Chrome headless with docker, check out `examples/docker/main.go` as well as `examples/docker/Makefile`.  When in that directory, you can do `make build` to build the container with the example app inside.
 
 ##### Custom Flags
 By default, we startup with the bare minimum flags necessary to start headless chrome and open a javascript console.  If you want more flags, like a resolution size, or a custom User-Agent, you can specify it by replacing the `Args` variable.  Just be sure to append to it so you don't kill the default flags...
@@ -26,8 +29,10 @@ headlessChrome.Args = append(headlessChrome.Args,"--window-size=1024,768")
 // make a new session
 browser, err := headlessChrome.NewBrowser(`google.com`)
 if err != nil {
-  t.Fatal(err)
+  panic(err)
 }
+// End the session by writing quit to the console
+defer browser.Exit()
 
 // sleep while content is rendered.  You could replace this
 // with some javascript that only returns when the
@@ -37,7 +42,7 @@ time.Sleep(time.Second * 5)
 // Query all the HTML from the web site
 browser.Write(`document.documentElement.outerHTML`)
 
-// loop over all the output that came from the ouput channel
+// loop over all the output that came from the output channel
 // and print it to the console
 for len(browser.Output) > 0 {
   fmt.Println(<-browser.Output)
@@ -48,13 +53,12 @@ browser.ClickItemWithInnerHTML("span", "Google Search",0)
 
 // select the content of something by its css classes
 browser.GetContentOfItemWithClasses("button arrow bold",0)
+time.Sleep(time.Second) // give it a second to query
 
 // read the selected stuff from the console by picking
 // the next item from the output channel
-fmt.Println(<- browser.Output)
+fmt.Println(<-browser.Output)
 
-// End the session by writing quit to the console
-browser.Exit()
 ```
 
 
