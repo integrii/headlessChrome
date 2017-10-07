@@ -23,7 +23,7 @@ func main() {
 	headlessChrome.Args = append(headlessChrome.Args, "--no-sandbox")
 
 	// make a new session
-	browser, err := headlessChrome.NewBrowser(`http://ebay.com`)
+	browser, err := headlessChrome.NewBrowser(`http://httpbin.org`)
 	if err != nil {
 		panic(err)
 	}
@@ -37,7 +37,7 @@ func main() {
 
 	// Query all the HTML from the web site for fun
 	browser.Write("document.documentElement.outerHTML")
-	time.Sleep(time.Second * 1)
+	time.Sleep(time.Second)
 
 	// loop over all the output that came from the ouput channel
 	// and print it to the console
