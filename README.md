@@ -12,7 +12,7 @@ You could use this package to click buttons and scrape content on/from a website
 [http://godoc.org/github.com/integrii/headlessChrome](http://godoc.org/github.com/integrii/headlessChrome)
 
 ##### Docker Version
-To run Chrome headless with docker, check out `examples/docker/main.go` as well as `examples/docker/Makefile`.  When in that directory, you can do `make build` to build the container with the example app inside.
+To run Chrome headless with docker, check out `examples/docker/main.go` as well as `examples/docker/Makefile`.  When in that directory, you can do `make test` to build and run the container with the example app inside.  You will see the source of httpbin.org displayed at the end of the build and run.
 
 ##### Custom Flags
 By default, we startup with the bare minimum flags necessary to start headless chrome and open a javascript console.  If you want more flags, like a resolution size, or a custom User-Agent, you can specify it by replacing the `Args` variable.  Just be sure to append to it so you don't kill the default flags...
@@ -34,11 +34,11 @@ headlessChrome.ChromePath = `/opt/google/chrome-unstable/chrome`
 
 ```go
 // make a new session
-browser, err := headlessChrome.NewBrowser(`google.com`)
+browser, err := headlessChrome.NewBrowser(`http://httpbin.org`)
 if err != nil {
   panic(err)
 }
-// End the session by writing quit to the console
+// Close the browser process when this func returns
 defer browser.Exit()
 
 // sleep while content is rendered.  You could replace this
@@ -48,13 +48,19 @@ time.Sleep(time.Second * 5)
 
 // Query all the HTML from the web site
 browser.Write(`document.documentElement.outerHTML`)
+time.Sleep(time.Second)
 
 // loop over all the output that came from the output channel
 // and print it to the console
 for len(browser.Output) > 0 {
   fmt.Println(<-browser.Output)
 }
+```
 
+
+##### Other useful commands are used like this:
+
+```go
 // click some span element from the page by its text content
 browser.ClickItemWithInnerHTML("span", "Google Search",0)
 
@@ -65,7 +71,6 @@ time.Sleep(time.Second) // give it a second to query
 // read the selected stuff from the console by picking
 // the next item from the output channel
 fmt.Println(<-browser.Output)
-
 ```
 
 
