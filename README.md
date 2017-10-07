@@ -58,7 +58,10 @@ for len(browser.Output) > 0 {
 ```
 
 
-##### Other useful commands are used like this:
+##### JavaScript Helper Examples
+
+Find the full list in [the docs](http://godoc.org/github.com/integrii/headlessChrome).
+
 
 ```go
 // click some span element from the page by its text content
