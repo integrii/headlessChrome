@@ -19,7 +19,11 @@ var BrowserStartupTime = time.Second * 20
 
 // ChromePath is the command to execute chrome
 var ChromePath = ChromePathMacOS
+
+// ChromePathMacOS is where chrome normally lives on MacOS
 var ChromePathMacOS = `/Applications/Google Chrome.app/Contents/MacOS/Google Chrome`
+
+// ChromePathDocker is where chrome normally lives in the project's docker container
 var ChromePathDocker = `/opt/google/chrome-unstable/chrome`
 
 // Args are the args that will be used to start chrome
@@ -60,7 +64,8 @@ type ChromeSession struct {
 // to the chrome console
 func (cs *ChromeSession) Exit() {
 	cs.Session.Write(`;quit`)
-	cs.Session.Exit()
+	cs.Session.Exit()  // exit the process with an interrupt signal
+	cs.Session.Close() // close the tty session
 }
 
 // Write writes to the Session
