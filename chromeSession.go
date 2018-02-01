@@ -1,3 +1,5 @@
+// Package headlessChrome is a Go package for working with headless Chrome. Run interactive JavaScript commands on web pages with Go and Chrome. Edit
+
 package headlessChrome
 
 import (
