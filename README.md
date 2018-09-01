@@ -1,9 +1,13 @@
 # headlessChrome 🤖
-**Support only for MacOS and Ubuntu on Docker for now.**  😬
+**Support only for Ubuntu on Docker for now.  Mac appears to not be working.**  😬
 
 A [go](https://golang.org) package for working with headless Chrome.  Run interactive JavaScript commands on pages with go and Chrome without a GUI.  Includes a few helpful functions out of the box to query and click selector paths by their classes, divs, or html content.
 
 You could use this package to click buttons and scrape content on/from a website as if you were a browser, or to render pages that wouldn't be supported by other things like phantomjs or casperjs.  Especially useful for sites that use EmberJS, where the content is rendered by javascript after the HTML payload is delivered.
+
+#### Examples
+
+An example project that does some simple things with a `Makefile` and `Dockerfile` is in the examples directory.
 
 #### Install
 `go get github.com/integrii/headlessChrome`
@@ -27,34 +31,6 @@ headlessChrome.Args = append(headlessChrome.Args,"--window-size=1024,768")
 Change the path to Chrome by simply setting the `headlessChrome.ChromePath` variable.  
 ```go
 headlessChrome.ChromePath = `/opt/google/chrome-unstable/chrome`
-```
-
-
-#### Mac Example
-
-```go
-// make a new session
-browser, err := headlessChrome.NewBrowser(`http://httpbin.org`)
-if err != nil {
-  panic(err)
-}
-// Close the browser process when this func returns
-defer browser.Exit()
-
-// sleep while content is rendered.  You could replace this
-// with some javascript that only returns when the
-// content exists to be safer.
-time.Sleep(time.Second * 5)
-
-// Query all the HTML from the web site
-browser.Write(`document.documentElement.outerHTML`)
-time.Sleep(time.Second)
-
-// loop over all the output that came from the output channel
-// and print it to the console
-for len(browser.Output) > 0 {
-  fmt.Println(<-browser.Output)
-}
 ```
 
 
