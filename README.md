@@ -1,3 +1,5 @@
+# DO NOT USE!  This project does not work anymore due to changes in Chrome.  Use the Chrome DevTools protocol in [chromedp](https://github.com/chromedp) instead!
+
 # headlessChrome 🤖
 **Support only for Ubuntu on Docker for now.  Mac appears to not be working.**  😬
 
